@@ -1,0 +1,24 @@
+# Node.js dependencies
+node_modules/
+
+# SQLite database file
+/db/mathmate.db
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Temporary files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific files
+.DS_Store   # macOS
+Thumbs.db   # Windows
+
+# IDE-specific files
+.idea/
+.vscode/
