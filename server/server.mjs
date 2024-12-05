@@ -4,6 +4,7 @@ import path from 'path';
 import sqlite3 from 'sqlite3';
 import dotenv from 'dotenv';
 import session from 'express-session';
+import cors from 'cors'; // Import CORS
 
 // Load environment variables
 dotenv.config();
@@ -15,12 +16,26 @@ const app = express();
 app.use(express.json()); // Built-in JSON body parser
 
 // Middleware for handling sessions
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your_secret_key', // Secret to sign the session ID
-  resave: false, // Do not force session to be saved on every request
-  saveUninitialized: false, // Do not save empty sessions
-  cookie: { secure: process.env.NODE_ENV === 'production' } // Set cookie to be secure in production
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'mathMate', // Secret key for signing the session ID
+    resave: false, // Do not save session if unmodified
+    saveUninitialized: false, // Do not create session until something is stored
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // Set to true in production (requires HTTPS)
+      httpOnly: true, // Prevent JavaScript from accessing the cookie
+      maxAge: 24 * 60 * 60 * 1000, // Cookie expiration (1 day)
+    },
+  })
+);
+
+// Enable CORS
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Frontend URL
+    credentials: true, // Allow cookies and credentials
+  })
+);
 
 // Ensure the 'db' directory exists
 const dbDirectory = path.dirname(process.env.DB_PATH || './db/mathmate.db');
@@ -50,7 +65,6 @@ app.use('/api', quizRoutes);
 app.use('/api', studentRoutes);
 app.use('/api', reportRoutes);
 app.use('/api', userRoutes);
-// Use the class routes
 app.use('/api', classRoutes);
 
 // Start the server
